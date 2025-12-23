@@ -98,7 +98,7 @@ namespace App01.Views
 
             Close(board);
         }
-
+        // cancel
         
         private void BtnCancel_Click(object? sender, RoutedEventArgs e)
         {
