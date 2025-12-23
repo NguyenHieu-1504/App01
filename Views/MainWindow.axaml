@@ -1,0 +1,132 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:App01.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="App01.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Parking Monitor"
+        Background="#E3F2FD"
+        Width="1000" Height="600">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="#2C3E50" Padding="20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="15" VerticalAlignment="Center">
+                    <Ellipse Width="12" Height="12" Fill="{Binding StatusColor}"/>
+                    <TextBlock Text="{Binding ConnectionStatus}" 
+                               Foreground="White" 
+                               FontSize="16"
+                               FontWeight="Bold"/>
+                    <TextBlock Text="{Binding LedStatus}" 
+                               Foreground="White" 
+                               FontSize="14"
+                               Margin="20,0,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                    <Button Name="btnStart" 
+            Content="▶️ Bắt Đầu" 
+            Click="BtnStart_Click"
+            Background="#27AE60"
+            Foreground="White"
+            IsEnabled="{Binding !IsRunning}"/>
+    <Button Name="btnStop" 
+            Content="⏹️ Dừng" 
+            Click="BtnStop_Click"
+            Background="#E74C3C"
+            Foreground="White"
+            IsEnabled="{Binding IsRunning}"/>
+                    <Button Name="btnTestLed" 
+                            Content="🔧 Test LED" 
+                            Click="BtnTestLed_Click"
+                            Background="#34495E"
+                            Foreground="White"/>
+                    <Button Name="btnSettings" 
+                            Content="⚙️ Settings" 
+                            Click="BtnSettings_Click"
+                            Background="#34495E"
+                            Foreground="White"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1" Background="#ECF0F1" Margin="30">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Card 1: Xe đang gửi -->
+            <Border Grid.Column="0" 
+                    Background="White" 
+                    CornerRadius="10" 
+                    BoxShadow="0 2 10 2 #40000000"
+                    Padding="30">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20">
+                    <TextBlock Text="XE ĐANG GỬI" 
+                               FontSize="24" 
+                               FontWeight="Bold"
+                               Foreground="#7F8C8D"
+                               HorizontalAlignment="Center"/>
+                    
+                    <TextBlock Text="{Binding ParkedCount}" 
+                               FontSize="96" 
+                               FontWeight="Bold"
+                               Foreground="#E74C3C"
+                               HorizontalAlignment="Center"/>
+                    
+                    <TextBlock Text="xe" 
+                               FontSize="20"
+                               Foreground="#95A5A6"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Card 2: Chỗ còn lại -->
+            <Border Grid.Column="2" 
+                    Background="White" 
+                    CornerRadius="10" 
+                    BoxShadow="0 2 10 2 #40000000"
+                    Padding="30">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20">
+                    <TextBlock Text="CHỖ CÒN LẠI" 
+                               FontSize="24" 
+                               FontWeight="Bold"
+                               Foreground="#7F8C8D"
+                               HorizontalAlignment="Center"/>
+                    
+                    <TextBlock Text="{Binding AvailableCount}" 
+                               FontSize="96" 
+                               FontWeight="Bold"
+                               Foreground="#27AE60"
+                               HorizontalAlignment="Center"/>
+                    
+                    <TextBlock Text="chỗ" 
+                               FontSize="20"
+                               Foreground="#95A5A6"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

@@ -1,0 +1,115 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
+        x:Class="App01.Views.LedTestWindow"
+        Title="Test Kết Nối LED"
+        Width="600" Height="550">
+    <ScrollViewer>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Kết nối -->
+        <StackPanel Grid.Row="0" Spacing="10">
+            <TextBlock Text="THÔNG TIN KẾT NỐI" FontWeight="Bold" FontSize="16"/>
+            
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="IP Address:" VerticalAlignment="Center" Width="100"/>
+                <TextBox Name="txtIpAddress" Text="192.168.1.100" Width="200"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="Port:" VerticalAlignment="Center" Width="100"/>
+                <TextBox Name="txtPort" Text="100" Width="200"/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button Name="btnConnect" Content="Kết Nối" Width="100" Click="BtnConnect_Click"/>
+                <Button Name="btnDisconnect" Content="Ngắt Kết Nối" Width="120" IsEnabled="False" Click="BtnDisconnect_Click"/>
+                <TextBlock Name="txtStatus" Text="Chưa kết nối" VerticalAlignment="Center" Foreground="Gray"/>
+            </StackPanel>
+        </StackPanel>
+
+        <Border Grid.Row="1" Height="1" Background="LightGray" Margin="0,20"/>
+
+        <!-- Nội dung hiển thị -->
+        <StackPanel Grid.Row="2" Spacing="10">
+            <TextBlock Text="NỘI DUNG HIỂN THỊ" FontWeight="Bold" FontSize="16"/>
+            
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="Dòng 1:" VerticalAlignment="Center" Width="100"/>
+                <TextBox Name="txtLine1" Text="XE ĐANG GỬI" Width="300"/>
+                <ComboBox Name="cboColor1" Width="100" SelectedIndex="0">
+                    <ComboBoxItem>Đỏ (1)</ComboBoxItem>
+                    <ComboBoxItem>Xanh lá (2)</ComboBoxItem>
+                    <ComboBoxItem>Vàng (3)</ComboBoxItem>
+                    <ComboBoxItem>Xanh dương (4)</ComboBoxItem>
+                    <ComboBoxItem>Tím (5)</ComboBoxItem>
+                    <ComboBoxItem>Lục lam (6)</ComboBoxItem>
+                    <ComboBoxItem>Trắng (7)</ComboBoxItem>
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="Dòng 2:" VerticalAlignment="Center" Width="100"/>
+                <TextBox Name="txtLine2" Text="100 CHỖ" Width="300"/>
+                <ComboBox Name="cboColor2" Width="100" SelectedIndex="1">
+                    <ComboBoxItem>Đỏ (1)</ComboBoxItem>
+                    <ComboBoxItem>Xanh lá (2)</ComboBoxItem>
+                    <ComboBoxItem>Vàng (3)</ComboBoxItem>
+                    <ComboBoxItem>Xanh dương (4)</ComboBoxItem>
+                    <ComboBoxItem>Tím (5)</ComboBoxItem>
+                    <ComboBoxItem>Lục lam (6)</ComboBoxItem>
+                    <ComboBoxItem>Trắng (7)</ComboBoxItem>
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <TextBlock Text="Hiệu ứng:" VerticalAlignment="Center" Width="100"/>
+                <ComboBox Name="cboEffect" Width="200" SelectedIndex="0">
+                    <ComboBoxItem>0 - Đứng yên</ComboBoxItem>
+                    <ComboBoxItem>1 - Chạy phải → trái</ComboBoxItem>
+                    <ComboBoxItem>2 - Chạy trái → phải</ComboBoxItem>
+                    <ComboBoxItem>3 - Nhấp nháy</ComboBoxItem>
+                </ComboBox>
+            </StackPanel>
+
+            <Button Name="btnSend" Content="Gửi Lên LED" Width="150" IsEnabled="False" Click="BtnSend_Click"/>
+        </StackPanel>
+
+        <Border Grid.Row="3" Height="1" Background="LightGray" Margin="0,20"/>
+
+        <!-- Quick Test -->
+        <StackPanel Grid.Row="4" Spacing="10">
+            <TextBlock Text="QUICK TEST" FontWeight="Bold" FontSize="16"/>
+            <StackPanel Orientation="Horizontal" Spacing="10">
+    <Button Content="Test Đỏ" Click="BtnTestRed_Click" Width="100"/>
+    <Button Content="Test Xanh" Click="BtnTestGreen_Click" Width="100"/>
+    <Button Content="Test Vàng" Click="BtnTestYellow_Click" Width="100"/>
+    <Button Content="Màn Hình Mặc Định" Click="BtnDefault_Click" Width="150"/>
+</StackPanel>
+        </StackPanel>
+
+        <!-- Log -->
+        <ScrollViewer Grid.Row="5" Margin="0,20,0,0">
+            <TextBlock Name="txtLog" 
+                       Text="=== LOG ===" 
+                       FontFamily="Consolas" 
+                       FontSize="12"
+                       TextWrapping="Wrap"/>
+        </ScrollViewer>
+
+        <!-- Close -->
+        <Button Grid.Row="6" Content="Đóng" Width="100" HorizontalAlignment="Right" Margin="0,10,0,0" Click="BtnClose_Click"/>
+    </Grid>
+        </ScrollViewer>
+</Window>

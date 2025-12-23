@@ -1,0 +1,56 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:models="using:App01.Models"
+        x:Class="App01.Views.LedBoardEditDialog"
+        Title="Bảng LED"
+        Width="500" Height="550"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        x:CompileBindings="False">
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="15">
+            <TextBlock Text="THÔNG TIN BẢNG LED" FontWeight="Bold" FontSize="16"/>
+            <StackPanel Spacing="5">
+                <TextBlock Text="Tên bảng LED: *"/>
+                <TextBox Name="txtName" Watermark="VD: LED Cổng 1, LED Tầng 2..."/>
+            </StackPanel>
+
+            <StackPanel Spacing="5">
+                <TextBlock Text="Địa chỉ IP: *"/>
+                <TextBox Name="txtIpAddress" Watermark="192.168.1.100"/>
+            </StackPanel>
+
+            <StackPanel Spacing="5">
+                <TextBlock Text="Cổng (Port): *"/>
+                <NumericUpDown Name="numPort" Minimum="1" Maximum="65535" Value="100"/>
+            </StackPanel>
+
+            <StackPanel Spacing="5">
+                <TextBlock Text="Thuộc khu vực: *"/>
+                <ComboBox Name="cboArea" DisplayMemberBinding="{Binding Name}" Width="300" HorizontalAlignment="Left"/>
+            </StackPanel>
+
+            <StackPanel Spacing="5">
+                <TextBlock Text="Kịch bản hiển thị: *"/>
+                <ComboBox Name="cboTemplate" DisplayMemberBinding="{Binding Name}" Width="300" HorizontalAlignment="Left"/>
+            </StackPanel>
+
+            <StackPanel Spacing="5">
+                <TextBlock Text="Timeout (ms):"/>
+                <NumericUpDown Name="numTimeout" Minimum="1000" Maximum="30000" Value="3000"/>
+            </StackPanel>
+
+            <CheckBox Name="chkActive" Content="Kích hoạt bảng LED này" IsChecked="True"/>
+
+            <StackPanel Spacing="5">
+                <TextBlock Text="Ghi chú:"/>
+                <TextBox Name="txtNotes" Height="60" TextWrapping="Wrap" Watermark="Ghi chú tùy chọn..."/>
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,20,0,0">
+                <Button Name="btnSave" Content="💾 Lưu" Width="100" Click="BtnSave_Click"/>
+                <Button Name="btnCancel" Content="Hủy" Width="100" Click="BtnCancel_Click"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Window>
