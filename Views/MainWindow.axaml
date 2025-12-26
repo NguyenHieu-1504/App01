@@ -32,9 +32,11 @@
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="15" VerticalAlignment="Center">
                     <Ellipse Width="12" Height="12" Fill="{Binding StatusColor}"/>
                     <TextBlock Text="{Binding ConnectionStatus}" 
-                               Foreground="White" 
-                               FontSize="16"
-                               FontWeight="Bold"/>
+                           FontSize="16" 
+                           FontWeight="Bold"
+                           TextWrapping="Wrap"
+                           TextAlignment="Center"
+                           Foreground="{Binding StatusColor}"/>
                     <TextBlock Text="{Binding LedStatus}" 
                                Foreground="White" 
                                FontSize="14"
@@ -42,23 +44,24 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
-                    <Button Name="btnStart" 
-            Content="▶️ Bắt Đầu" 
-            Click="BtnStart_Click"
-            Background="#27AE60"
-            Foreground="White"
-            IsEnabled="{Binding !IsRunning}"/>
-    <Button Name="btnStop" 
-            Content="⏹️ Dừng" 
-            Click="BtnStop_Click"
-            Background="#E74C3C"
-            Foreground="White"
-            IsEnabled="{Binding IsRunning}"/>
+                    <!--<Button Name="btnStart" 
+                            Content="▶️ Bắt Đầu" 
+                            Click="BtnStart_Click"
+                            Background="#27AE60"
+                            Foreground="White"
+                            IsEnabled="{Binding !IsRunning}"/>
+                    <Button Name="btnStop" 
+                            Content="⏹️ Dừng" 
+                            Click="BtnStop_Click"
+                            Background="#E74C3C"
+                            Foreground="White"
+                            IsEnabled="{Binding IsRunning}"/>-->
                     <Button Name="btnTestLed" 
                             Content="🔧 Test LED" 
                             Click="BtnTestLed_Click"
                             Background="#34495E"
                             Foreground="White"/>
+                    <Button Name="btnReload" Content="🔄 Reload" Click="BtnReload_Click"/>
                     <Button Name="btnSettings" 
                             Content="⚙️ Settings" 
                             Click="BtnSettings_Click"

@@ -1,4 +1,5 @@
-﻿using SQLite;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using SQLite;
 using System.Collections.Generic;
 using System.Text.Json;
 
@@ -58,6 +59,9 @@ namespace App01.Models
         /// </summary>
         public string? Notes { get; set; }
 
+        [BsonElement("IsActive")]
+        public bool IsActive { get; set; } = true; // Mặc định active
+
         /// <summary>
         /// Parse ColorRulesJson thành List<ColorRule>
         /// </summary>
@@ -110,5 +114,9 @@ namespace App01.Models
         {
             return percentAvailable >= MinPercent && percentAvailable <= MaxPercent;
         }
+
+
     }
-}
+    
+
+    }

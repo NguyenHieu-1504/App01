@@ -28,22 +28,29 @@ namespace App01.Views
             var testWindow = new LedTestWindow();
             testWindow.Show();
         }
-
-        private async void BtnStart_Click(object? sender, RoutedEventArgs e)
+        private async void BtnReload_Click(object? sender, RoutedEventArgs e)
         {
             if (DataContext is MainWindowViewModel vm)
             {
-                await vm.StartMonitoringAsync();
+                await vm.ReloadConfigurationAsync();
             }
         }
 
-        private void BtnStop_Click(object? sender, RoutedEventArgs e)
-        {
-            if (DataContext is MainWindowViewModel vm)
-            {
-                vm.StopMonitoring();
-            }
-        }
+        //private async void BtnStart_Click(object? sender, RoutedEventArgs e)
+        //{
+        //    if (DataContext is MainWindowViewModel vm)
+        //    {
+        //        await vm.StartMonitoringAsync();
+        //    }
+        //}
+
+        //private void BtnStop_Click(object? sender, RoutedEventArgs e)
+        //{
+        //    if (DataContext is MainWindowViewModel vm)
+        //    {
+        //        vm.StopMonitoring();
+        //    }
+        //}
 
         private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
         {

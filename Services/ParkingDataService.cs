@@ -39,7 +39,7 @@ namespace App01.Services
 
             //  EventCode = 1 VÀ IsDelete = false
             var builder = Builders<ParkingRecord>.Filter;
-            var filter = builder.Eq(x => x.EventCode, 1) &
+            var filter = builder.Eq(x => x.EventCode, "1") &
                          builder.Eq(x => x.IsDelete, false);
 
             try

@@ -15,7 +15,8 @@ namespace App01.Views
         }
         public AreaEditDialog(Area? area = null)
         {
-            
+            InitializeComponent();
+
             _editingArea = area;
 
             if (area != null)

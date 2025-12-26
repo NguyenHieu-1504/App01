@@ -74,6 +74,44 @@ namespace App01.ViewModels
             _isRunning = false;
 
             Debug.WriteLine("[MAIN] App khởi động. Đợi cấu hình từ Settings.");
+            // ⬇ TỰ ĐỘNG START SAU 1 GIÂY
+            _ = AutoStartAsync();
+        }
+
+        private async Task AutoStartAsync()
+        {
+            // Delay 1 giây để UI load xong
+            await Task.Delay(1000);
+
+            Debug.WriteLine("[AUTO-START] Kiểm tra cấu hình...");
+
+            // Kiểm tra đã cấu hình chưa
+            var config = _configService.GetConfig();
+            var areas = _configService.GetActiveAreas();
+
+            if (areas.Count == 0)
+            {
+                ConnectionStatus = "⚠️ Chưa có cấu hình! Vui lòng vào Settings để cấu hình.";
+                StatusColor = "Orange";
+                Debug.WriteLine("[AUTO-START] Không có khu vực nào được cấu hình!");
+                return;
+            }
+
+            // Kiểm tra connection string
+            var area = areas.First();
+            string connString = area.MongoConnectionString ?? config.MongoConnectionString;
+
+            if (string.IsNullOrWhiteSpace(connString))
+            {
+                ConnectionStatus = "⚠️ Chưa cấu hình MongoDB! Vui lòng vào Settings.";
+                StatusColor = "Orange";
+                Debug.WriteLine("[AUTO-START] Connection string trống!");
+                return;
+            }
+
+            // Nếu đã có cấu hình → Tự động start
+            Debug.WriteLine("[AUTO-START] Đã có cấu hình, bắt đầu monitoring...");
+            await StartMonitoringAsync();
         }
 
         /// <summary>
@@ -89,13 +127,16 @@ namespace App01.ViewModels
 
             try
             {
+                ConnectionStatus = "Đang kiểm tra cấu hình...";
+                StatusColor = "Orange";
+
                 // 1. Lấy cấu hình
                 var config = _configService.GetConfig();
                 var areas = _configService.GetActiveAreas();
 
                 if (areas.Count == 0)
                 {
-                    ConnectionStatus = "⚠️ Chưa có khu vực! Vào Settings để tạo.";
+                    ConnectionStatus = "⚠️ Chưa có khu vực!\nVui lòng vào Settings → Tab 'Khu Vực' để thêm khu vực mới.";
                     StatusColor = "Orange";
                     Debug.WriteLine("[MAIN] Không có khu vực nào.");
                     return;
@@ -104,66 +145,76 @@ namespace App01.ViewModels
                 var area = areas.First();
                 Debug.WriteLine($"[MAIN] Khởi động khu vực: {area.Name}");
 
-
-                var templates = _configService.GetAllDisplayTemplates();
-                foreach (var t in templates)
-                {
-                    Debug.WriteLine($"[DEBUG] Template: Id={t.Id}, Name={t.Name}, FontSize={t.FontSize}, ColorRules Count={t.ColorRules.Count}");
-                }
-
                 // 2. Kết nối MongoDB
-                ConnectionStatus = "Đang kết nối MongoDB...";
+                ConnectionStatus = $"Đang kết nối MongoDB ({area.Name})...";
                 StatusColor = "Orange";
 
                 _parkingService = new ParkingDataService();
                 string connString = area.MongoConnectionString ?? config.MongoConnectionString;
                 string dbName = area.DatabaseName ?? config.DatabaseName;
 
+                if (string.IsNullOrWhiteSpace(connString) || string.IsNullOrWhiteSpace(dbName))
+                {
+                    ConnectionStatus = "⚠️ Chưa cấu hình MongoDB!\nVui lòng vào Settings → Tab 'MongoDB' để cấu hình.";
+                    StatusColor = "Orange";
+                    Debug.WriteLine("[MAIN] Connection string hoặc DB name trống!");
+                    return;
+                }
+
                 bool mongoConnected = _parkingService.Connect(connString, dbName);
 
                 if (!mongoConnected)
                 {
-                    ConnectionStatus = "❌ MongoDB lỗi!";
+                    ConnectionStatus = "❌ Không thể kết nối MongoDB!\nKiểm tra: IP, Port, Username, Password";
                     StatusColor = "Red";
                     Debug.WriteLine("[MAIN] Không thể kết nối MongoDB!");
                     return;
                 }
 
-                ConnectionStatus = "✅ MongoDB OK";
+                ConnectionStatus = $"✅ MongoDB OK - {area.Name}";
                 StatusColor = "Green";
 
                 // 3. Kết nối LED boards
                 var ledBoards = _configService.GetActiveLedBoardsByArea(area.Id);
-                int connectedLeds = 0;
 
-                foreach (var board in ledBoards)
+                if (ledBoards.Count == 0)
                 {
-                    var ledService = new LedService();
-                    bool ledConnected = ledService.Connect(board.IpAddress, board.Port);
-
-                    if (ledConnected)
-                    {
-                        _ledServices[board.Id] = ledService;
-                        connectedLeds++;
-                        Debug.WriteLine($"[LED] Kết nối OK: {board.Name} ({board.IpAddress})");
-                    }
-                    else
-                    {
-                        Debug.WriteLine($"[LED] Kết nối THẤT BẠI: {board.Name}");
-                        ledService.Dispose();
-                    }
+                    LedStatus = "⚠️ Chưa có bảng LED nào được cấu hình";
+                    Debug.WriteLine("[MAIN] Không có LED board nào!");
                 }
+                else
+                {
+                    int connectedLeds = 0;
 
-                LedStatus = connectedLeds > 0
-                    ? $"LED: {connectedLeds}/{ledBoards.Count} OK"
-                    : "LED: Không kết nối được";
+                    foreach (var board in ledBoards)
+                    {
+                        var ledService = new LedService();
+                        bool ledConnected = ledService.Connect(board.IpAddress, board.Port);
+
+                        if (ledConnected)
+                        {
+                            _ledServices[board.Id] = ledService;
+                            connectedLeds++;
+                            Debug.WriteLine($"[LED] Kết nối OK: {board.Name} ({board.IpAddress})");
+                        }
+                        else
+                        {
+                            Debug.WriteLine($"[LED] Kết nối THẤT BẠI: {board.Name}");
+                            ledService.Dispose();
+                        }
+                    }
+
+                    LedStatus = connectedLeds > 0
+                        ? $"LED: {connectedLeds}/{ledBoards.Count} OK"
+                        : "LED: Không kết nối được";
+                }
 
                 // 4. Bắt đầu polling
                 _cts = new CancellationTokenSource();
                 _isRunning = true;
                 int interval = area.RefreshIntervalSeconds;
 
-                Debug.WriteLine($"[MAIN] Bắt đầu polling {interval}s");
+                Debug.WriteLine($"[MAIN] Bắt đầu polling mỗi {interval}s");
 
                 _ = Task.Run(async () =>
                 {
@@ -188,10 +239,41 @@ namespace App01.ViewModels
             }
             catch (Exception ex)
             {
-                ConnectionStatus = $"❌ Lỗi: {ex.Message}";
+                ConnectionStatus = $"❌ Lỗi khởi động: {ex.Message}";
                 StatusColor = "Red";
                 Debug.WriteLine($"[MAIN FATAL] {ex}");
             }
+        }
+
+        /// <summary>
+        /// Reload toàn bộ cấu hình và restart monitoring
+        /// </summary>
+        public async Task ReloadConfigurationAsync()
+        {
+            Debug.WriteLine("[RELOAD] Đang reload cấu hình...");
+
+            // 1. Dừng monitoring hiện tại (nếu đang chạy)
+            if (_isRunning)
+            {
+                StopMonitoring();
+                // Chờ 1 giây để cleanup hoàn tất
+                await Task.Delay(1000);
+            }
+
+            // 2. Reset trạng thái
+            ConnectionStatus = "Đang reload cấu hình...";
+            StatusColor = "Orange";
+            ParkedCount = "--";
+            AvailableCount = "--";
+            LedStatus = "LED: Chưa kết nối";
+
+            // 3. Chờ 500ms cho UI cập nhật
+            await Task.Delay(500);
+
+            // 4. Start lại với cấu hình mới
+            await StartMonitoringAsync();
+
+            Debug.WriteLine("[RELOAD] Hoàn tất reload!");
         }
 
         /// <summary>
@@ -199,12 +281,28 @@ namespace App01.ViewModels
         /// </summary>
         public void StopMonitoring()
         {
+            if (!_isRunning)
+            {
+                Debug.WriteLine("[MAIN] Chưa chạy, không cần stop!");
+                return;
+            }
+
+            Debug.WriteLine("[MAIN] Đang dừng monitoring...");
+
             _cts?.Cancel();
             _isRunning = false;
 
+            // Cleanup LED connections
             foreach (var led in _ledServices.Values)
             {
-                led.Dispose();
+                try
+                {
+                    led.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"[LED CLEANUP ERROR] {ex.Message}");
+                }
             }
             _ledServices.Clear();
 

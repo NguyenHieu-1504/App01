@@ -28,6 +28,6 @@ namespace App01.Models
         public bool IsDelete { get; set; }
 
         [BsonElement("EventCode")]
-        public int? EventCode { get; set; }
+        public string EventCode { get; set; }
     }
 }

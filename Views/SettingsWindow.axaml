@@ -39,7 +39,7 @@
 
                         <StackPanel Spacing="10">
                             <TextBlock Text="Collection Name:"/>
-                            <TextBox Name="txtCollectionName" Watermark="tblCardEventDay"/>
+                            <TextBox Name="txtCollectionName" IsReadOnly="True" Watermark="tblCardEventDay"/>
                         </StackPanel>
 
                         <Button Name="btnTestMongo" Content="🔌 Test Kết Nối" Width="150" HorizontalAlignment="Left" Click="BtnTestMongo_Click"/>
@@ -58,9 +58,9 @@
 
                     <TextBlock Grid.Row="0" Text="QUẢN LÝ KHU VỰC" FontWeight="Bold" FontSize="18" Margin="0,0,0,15"/>
 
-                    <Border Grid.Row="1" BorderBrush="LightGray" BorderThickness="1" MinHeight="200">
+                    <Border Grid.Row="1" BorderBrush="LightGray" BorderThickness="1" Background="White" MinHeight="200">
                         <DataGrid Name="dgAreas"
-                                  x:DataType="models:Area"
+                                  
                                   AutoGenerateColumns="False"
                                   IsReadOnly="True"
                                   SelectionMode="Single"
@@ -95,9 +95,9 @@
 
                     <TextBlock Grid.Row="0" Text="QUẢN LÝ BẢNG LED" FontWeight="Bold" FontSize="18" Margin="0,0,0,15"/>
 
-                    <Border Grid.Row="1" BorderBrush="LightGray" BorderThickness="1" MinHeight="200">
+                    <Border Grid.Row="1" BorderBrush="LightGray" BorderThickness="1" Background="White" MinHeight="200">
                         <DataGrid Name="dgLedBoards"
-                                  x:DataType="models:LedBoard"
+                                  
                                   AutoGenerateColumns="False"
                                   IsReadOnly="True"
                                   SelectionMode="Single"
@@ -133,9 +133,9 @@
 
                     <TextBlock Grid.Row="0" Text="QUẢN LÝ KỊCH BẢN HIỂN THỊ" FontWeight="Bold" FontSize="18" Margin="0,0,0,15"/>
 
-                    <Border Grid.Row="1" BorderBrush="LightGray" BorderThickness="1" MinHeight="200">
+                    <Border Grid.Row="1" BorderBrush="LightGray" BorderThickness="1" Background="White" MinHeight="200">
                         <DataGrid Name="dgTemplates"
-                                  x:DataType="models:DisplayTemplate"
+                                  
                                   AutoGenerateColumns="False"
                                   IsReadOnly="True"
                                   SelectionMode="Single"
@@ -147,6 +147,7 @@
                                 <DataGridTextColumn Header="Dòng 1" Binding="{Binding Line1Format}" Width="200"/>
                                 <DataGridTextColumn Header="Dòng 2" Binding="{Binding Line2Format}" Width="200"/>
                                 <DataGridTextColumn Header="Font Size" Binding="{Binding FontSize}" Width="80"/>
+                                <DataGridCheckBoxColumn Header="Active" Binding="{Binding IsActive}" Width="80"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </Border>
@@ -160,7 +161,7 @@
             </TabItem>
 
         </TabControl>
-
+        
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,15,0,0">
             <Button Name="btnSave" Content="💾 Lưu Cấu Hình" Width="150" Click="BtnSave_Click"/>
             <Button Name="btnClose" Content="Đóng" Width="100" Click="BtnClose_Click"/>

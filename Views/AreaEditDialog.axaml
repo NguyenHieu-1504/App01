@@ -16,7 +16,7 @@
 
             <StackPanel Spacing="5">
                 <TextBlock Text="Sức chứa (số chỗ đỗ): *"/>
-                <NumericUpDown Name="numMaxCapacity" Minimum="1" Maximum="10000" Value="100"/>
+                <NumericUpDown Name="numMaxCapacity" Minimum="1" Maximum="10000" Value="100" FormatString="0"/>
             </StackPanel>
 
             <StackPanel Spacing="5">

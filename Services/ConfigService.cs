@@ -174,7 +174,24 @@ namespace App01.Services
             {
                 Debug.WriteLine($"[ERROR] Insert: {ex.Message}");
             }
-            
+
+        }
+
+        public List<DisplayTemplate> GetActiveDisplayTemplates()
+        {
+            var list = _db.Table<DisplayTemplate>().Where(t => t.IsActive).ToList();
+
+            foreach (var item in list)
+            {
+                try
+                {
+                    if (!string.IsNullOrEmpty(item.ColorRulesJson))
+                        item.ColorRules = JsonSerializer.Deserialize<List<ColorRule>>(item.ColorRulesJson) ?? new List<ColorRule>();
+                }
+                catch { item.ColorRules = new List<ColorRule>(); }
+            }
+
+            return list;
         }
 
         public void UpdateDisplayTemplate(DisplayTemplate template)
