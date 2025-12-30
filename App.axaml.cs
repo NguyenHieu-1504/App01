@@ -15,6 +15,7 @@ public partial class App : Application
 {
     public override void Initialize()
     {
+        SQLitePCL.Batteries.Init();
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         AvaloniaXamlLoader.Load(this);
     }

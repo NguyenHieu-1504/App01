@@ -48,6 +48,175 @@
                 </ScrollViewer>
             </TabItem>
 
+            <TabItem Header="🚪 Cổng &amp; Làn">
+                <ScrollViewer>
+                    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto,Auto,*" Margin="10">
+
+                        <!-- === PHẦN 1: QUẢN LÝ CỔNG === -->
+                        <TextBlock Grid.Row="0" 
+                                   Text="🚪 Quản lý Cổng (Gates)" 
+                                   FontSize="16" FontWeight="Bold" 
+                                   Margin="0,0,0,10"/>
+
+                        <!-- Toolbar Cổng -->
+                        <StackPanel Grid.Row="1" Margin="0,0,0,10">
+                            <!-- Row 1: Load từ MongoDB -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <Button Name="BtnLoadGatesFromMongo" 
+                                        Content="📥 Load Gates từ MongoDB" 
+                                        Click="BtnLoadGatesFromMongo_Click"
+                                        Background="DodgerBlue"
+                                        Foreground="White"
+                                        Margin="0,0,10,0"/>
+                                <TextBlock Text="(Lấy danh sách cổng từ database)" 
+                                           VerticalAlignment="Center"
+                                           Foreground="Gray"
+                                           FontSize="11"/>
+                            </StackPanel>
+                            
+                            <!-- Row 2: Thêm thủ công -->
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox Name="CbAreaForGate" 
+                                          Width="150" 
+                                          PlaceholderText="Chọn khu vực"
+                                          Margin="0,0,10,0"/>
+                                <TextBox Name="TxtGateIdMongo" 
+                                         Width="200" 
+                                         Watermark="Gate ID (MongoDB)" 
+                                         Margin="0,0,10,0"/>
+                                <TextBox Name="TxtGateCode" 
+                                         Width="80" 
+                                         Watermark="Code" 
+                                         Margin="0,0,10,0"/>
+                                <TextBox Name="TxtGateName" 
+                                         Width="120" 
+                                         Watermark="Tên cổng" 
+                                         Margin="0,0,10,0"/>
+                                <Button Name="BtnAddGate" 
+                                        Content="➕ Thêm" 
+                                        Click="BtnAddGate_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- DataGrid Cổng -->
+                        <DataGrid Grid.Row="2" 
+                                  Name="GatesDataGrid"
+                                  Height="200"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="False"
+                                  CanUserSortColumns="True"
+                                  Margin="0,0,0,20">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="40" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Gate ID (Mongo)" Binding="{Binding GateIdMongo}" Width="150" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Code" Binding="{Binding GateCode}" Width="60"/>
+                                <DataGridTextColumn Header="Tên cổng" Binding="{Binding GateName}" Width="*"/>
+                                <DataGridTextColumn Header="Area ID" Binding="{Binding AreaId}" Width="60" IsReadOnly="True"/>
+                                <DataGridCheckBoxColumn Header="Active" Binding="{Binding IsActive}" Width="60"/>
+                                <DataGridTemplateColumn Header="Thao tác" Width="120">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                                <Button Content="💾" 
+                                                        Click="BtnUpdateGate_Click" 
+                                                        Tag="{Binding Id}"
+                                                        ToolTip.Tip="Lưu"/>
+                                                <Button Content="🗑️" 
+                                                        Click="BtnDeleteGate_Click" 
+                                                        Tag="{Binding Id}"
+                                                        ToolTip.Tip="Xóa"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <!-- Separator -->
+                        <Border Grid.Row="3" Height="2" Background="LightGray" Margin="0,10"/>
+
+                        <!-- === PHẦN 2: QUẢN LÝ LÀN === -->
+                        <TextBlock Grid.Row="4" 
+                                   Text="🛣️ Quản lý Làn (Lanes)" 
+                                   FontSize="16" FontWeight="Bold" 
+                                   Margin="0,10,0,10"/>
+
+                        <!-- Toolbar Làn -->
+                        <StackPanel Grid.Row="5" Margin="0,0,0,10">
+                            <!-- Row 1: Load từ MongoDB -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <Button Name="BtnLoadLanesFromMongo" 
+                                        Content="📥 Load Lanes từ MongoDB" 
+                                        Click="BtnLoadLanesFromMongo_Click"
+                                        Background="DodgerBlue"
+                                        Foreground="White"
+                                        Margin="0,0,10,0"/>
+                                <TextBlock Text="(Lấy danh sách làn từ database)" 
+                                           VerticalAlignment="Center"
+                                           Foreground="Gray"
+                                           FontSize="11"/>
+                            </StackPanel>
+                            
+                            <!-- Row 2: Thêm thủ công -->
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox Name="CbGateForLane" 
+                                          Width="150" 
+                                          PlaceholderText="Chọn cổng"
+                                          Margin="0,0,10,0"/>
+                                <TextBox Name="TxtLaneIdMongo" 
+                                         Width="200" 
+                                         Watermark="Lane ID (MongoDB)" 
+                                         Margin="0,0,10,0"/>
+                                <TextBox Name="TxtLaneCode" 
+                                         Width="60" 
+                                         Watermark="Code" 
+                                         Margin="0,0,10,0"/>
+                                <TextBox Name="TxtLaneName" 
+                                         Width="100" 
+                                         Watermark="Tên làn" 
+                                         Margin="0,0,10,0"/>
+                                <Button Name="BtnAddLane" 
+                                        Content="➕ Thêm" 
+                                        Click="BtnAddLane_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- DataGrid Làn -->
+                        <DataGrid Grid.Row="6" 
+                                  Name="LanesDataGrid"
+                                  Height="200"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="40" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Lane ID (Mongo)" Binding="{Binding LaneIdMongo}" Width="150" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Code" Binding="{Binding LaneCode}" Width="50"/>
+                                <DataGridTextColumn Header="Tên làn" Binding="{Binding LaneName}" Width="*"/>
+                                <DataGridTextColumn Header="Gate ID" Binding="{Binding GateId}" Width="60" IsReadOnly="True"/>
+                                <DataGridCheckBoxColumn Header="Active" Binding="{Binding IsActive}" Width="60"/>
+                                <DataGridTemplateColumn Header="Thao tác" Width="120">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                                <Button Content="💾" 
+                                                        Click="BtnUpdateLane_Click" 
+                                                        Tag="{Binding Id}"
+                                                        ToolTip.Tip="Lưu"/>
+                                                <Button Content="🗑️" 
+                                                        Click="BtnDeleteLane_Click" 
+                                                        Tag="{Binding Id}"
+                                                        ToolTip.Tip="Xóa"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+
             <TabItem Header="📍 Khu Vực">
                 <Grid Margin="20">
                     <Grid.RowDefinitions>

@@ -29,5 +29,8 @@ namespace App01.Models
 
         [BsonElement("EventCode")]
         public string EventCode { get; set; }
+
+        [BsonElement("LaneId")] 
+        public string? LaneId { get; set; }
     }
 }

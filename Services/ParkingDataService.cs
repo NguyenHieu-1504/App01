@@ -2,6 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -33,14 +34,22 @@ namespace App01.Services
         }
 
         // Hàm đếm số xe đang gửi
-        public async Task<long> CountParkedCarsAsync()
+        public async Task<long> CountParkedCarsAsync(List<string>? laneIds = null)
         {
             if (_collection == null) return -1;
 
-            //  EventCode = 1 VÀ IsDelete = false
             var builder = Builders<ParkingRecord>.Filter;
+
+            // Filter cơ bản
             var filter = builder.Eq(x => x.EventCode, "1") &
                          builder.Eq(x => x.IsDelete, false);
+
+            // Thêm filter theo LaneId nếu có
+            if (laneIds != null && laneIds.Count > 0)
+            {
+                var laneFilter = builder.In(x => x.LaneId, laneIds);
+                filter = filter & laneFilter;
+            }
 
             try
             {

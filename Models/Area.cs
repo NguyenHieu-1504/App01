@@ -1,4 +1,5 @@
 ﻿using SQLite;
+using System.Collections.Generic;
 
 namespace App01.Models
 {
@@ -60,5 +61,8 @@ namespace App01.Models
         /// Ghi chú về khu vực (tùy chọn)
         /// </summary>
         public string? Notes { get; set; }
+
+        [Ignore] // Không lưu vào SQLite, chỉ dùng runtime
+        public List<Gate> Gates { get; set; } = new List<Gate>();
     }
 }

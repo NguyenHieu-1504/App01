@@ -317,7 +317,18 @@ namespace App01.ViewModels
         {
             if (_parkingService == null) return;
 
-            long parkedCount = await _parkingService.CountParkedCarsAsync();
+            //  Lấy danh sách LaneIdMongo từ các Gate của Area
+            var lanes = _configService.GetLanesByArea(area.Id);
+            var laneIds = lanes.Select(l => l.LaneIdMongo).ToList();
+
+            Debug.WriteLine($"[MAIN] Đếm xe cho Area {area.Name} với {laneIds.Count} lanes");
+            foreach (var laneId in laneIds)
+            {
+                Debug.WriteLine($"  - Lane ID: {laneId}");
+            }
+
+            // Đếm xe với filter theo LaneId
+            long parkedCount = await _parkingService.CountParkedCarsAsync(laneIds);
 
             if (parkedCount < 0) return;
 

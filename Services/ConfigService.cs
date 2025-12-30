@@ -18,34 +18,38 @@ namespace App01.Services
         {
             try
             {
-                // Lưu DB vào thư mục LocalApplicationData để tránh lỗi quyền hạn
-                var dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "parking_config.db");
+                // Lấy đường dẫn thư mục
+                var folderPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
 
-                Debug.WriteLine($"[DEBUG] DB Path: {dbPath}");  // Log path để kiểm tra
-                if (!File.Exists(dbPath))
+                //  Kiểm tra và tạo thư mục nếu chưa có 
+                if (!Directory.Exists(folderPath))
                 {
-                    Debug.WriteLine("[DEBUG] Creating new DB file");
-                    File.Create(dbPath).Close();  // Thử tạo file thủ công
+                    Directory.CreateDirectory(folderPath);
                 }
 
-                //var dbPath = Path.Combine(Environment.CurrentDirectory, "parking_config.db");
+                var dbPath = Path.Combine(folderPath, "parking_config.db");
+                Debug.WriteLine($"[DEBUG] DB Path: {dbPath}");
 
+                // Tạo file connection
                 _db = new SQLiteConnection(dbPath);
 
-                // Tạo bảng (nếu chưa có)
+                // Tạo bảng
                 _db.CreateTable<AppConfig>();
                 _db.CreateTable<Area>();
                 _db.CreateTable<LedBoard>();
                 _db.CreateTable<DisplayTemplate>();
+                _db.CreateTable<Gate>();
+                _db.CreateTable<Lane>();
 
                 InitializeDefaultData();
-
-                Debug.WriteLine("DB Path: " + dbPath);
-
             }
             catch (Exception ex)
             {
+                // In lỗi ra Console.Error để dễ thấy trên Terminal Linux
+                Console.Error.WriteLine($"[CRITICAL ERROR] DB Init Failed: {ex.Message}");
                 Debug.WriteLine($"[ERROR] DB Init: {ex.Message}");
+
+                // throw; 
             }
         }
         private void InitializeDefaultData()
@@ -89,6 +93,11 @@ namespace App01.Services
         // ============ AppConfig ============
         public AppConfig GetConfig()
         {
+            if (_db == null)
+            {
+                Console.Error.WriteLine("[ERROR] Database connection is NULL. Returning default config.");
+                return new AppConfig(); // Trả về object rỗng để tránh crash
+            }
             return _db.Table<AppConfig>().FirstOrDefault() ?? new AppConfig();
         }
 
@@ -128,7 +137,7 @@ namespace App01.Services
 
         public void DeleteLedBoard(int id) => _db.Delete<LedBoard>(id);
 
-        // ============ Display Templates (Cần xử lý JSON) ============
+        // ============ Display Templates  ============
         public List<DisplayTemplate> GetAllDisplayTemplates()
         {
             var list = _db.Table<DisplayTemplate>().ToList();
@@ -205,7 +214,40 @@ namespace App01.Services
             _db.Delete<DisplayTemplate>(id);
         }
 
+        // ============ Gates ============
+        public List<Gate> GetGatesByArea(int areaId)
+            => _db.Table<Gate>().Where(g => g.AreaId == areaId && g.IsActive).ToList();
 
+        public List<Gate> GetAllGates()
+            => _db.Table<Gate>().ToList();
+
+
+        public void InsertGate(Gate gate) => _db.Insert(gate);
+        public void UpdateGate(Gate gate) => _db.Update(gate);
+        public void DeleteGate(int id) => _db.Delete<Gate>(id);
+
+        // ============ Lanes ============
+
+        public List<Lane> GetAllLanes() => _db.Table<Lane>().ToList();
+
+        public List<Lane> GetLanesByGate(int gateId)
+            => _db.Table<Lane>().Where(l => l.GateId == gateId && l.IsActive).ToList();
+
+        public List<Lane> GetLanesByArea(int areaId)
+        {
+            // Lấy tất cả Gate của Area
+            var gates = GetGatesByArea(areaId);
+            var gateIds = gates.Select(g => g.Id).ToList();
+
+            // Lấy tất cả Lane của các Gate đó
+            return _db.Table<Lane>()
+                .Where(l => gateIds.Contains(l.GateId) && l.IsActive)
+                .ToList();
+        }
+
+        public void InsertLane(Lane lane) => _db.Insert(lane);
+        public void UpdateLane(Lane lane) => _db.Update(lane);
+        public void DeleteLane(int id) => _db.Delete<Lane>(id);
 
         public void CloseConnection() => _db?.Close();
     }
