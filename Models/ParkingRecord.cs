@@ -30,7 +30,16 @@ namespace App01.Models
         [BsonElement("EventCode")]
         public string EventCode { get; set; }
 
-        [BsonElement("LaneId")] 
+        [BsonElement("VehicleGroupID")]
+        public string VehicleGroupID { get; set; }
+
+
+        [BsonElement("LaneIDIn")]
         public string? LaneId { get; set; }
+
+        [BsonElement("LaneIDOut")]
+        public string? LaneIDOut { get; set; }
+
+
     }
 }

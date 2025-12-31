@@ -68,5 +68,8 @@ namespace App01.Models
 
         [BsonElement("Controller")]
         public string Controller { get; set; } = "";
+
+        [BsonElement("LaneType")]
+        public int LaneType { get; set; } = 0;
     }
 }

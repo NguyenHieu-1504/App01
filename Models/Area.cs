@@ -3,11 +3,13 @@ using System.Collections.Generic;
 
 namespace App01.Models
 {
+    [Table("Area")]
     /// <summary>
     /// Model đại diện cho 1 khu vực đỗ xe
     /// </summary>
     public class Area
     {
+        
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
 
@@ -61,6 +63,8 @@ namespace App01.Models
         /// Ghi chú về khu vực (tùy chọn)
         /// </summary>
         public string? Notes { get; set; }
+
+        public string? VehicleGroupID { get; set; }
 
         [Ignore] // Không lưu vào SQLite, chỉ dùng runtime
         public List<Gate> Gates { get; set; } = new List<Gate>();

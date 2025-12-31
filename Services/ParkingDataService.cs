@@ -34,7 +34,8 @@ namespace App01.Services
         }
 
         // Hàm đếm số xe đang gửi
-        public async Task<long> CountParkedCarsAsync(List<string>? laneIds = null)
+        public async Task<long> CountParkedCarsAsync(List<string>? laneIds = null,
+            string? vehicleGroupId = null)
         {
             if (_collection == null) return -1;
 
@@ -43,22 +44,41 @@ namespace App01.Services
             // Filter cơ bản
             var filter = builder.Eq(x => x.EventCode, "1") &
                          builder.Eq(x => x.IsDelete, false);
+            builder.Eq(x => x.VehicleGroupID, "84A002E0-34F3-46DA-9B69-1FA76FCF4C91");
 
-            // Thêm filter theo LaneId nếu có
+            // Thêm filter theo LaneId 
             if (laneIds != null && laneIds.Count > 0)
             {
+                Debug.WriteLine($"[PARKING SERVICE] Filtering by {laneIds.Count} lanes:");
+                foreach (var laneId in laneIds)
+                {
+                    Debug.WriteLine($"  - {laneId}");
+                }
+
                 var laneFilter = builder.In(x => x.LaneId, laneIds);
                 filter = filter & laneFilter;
             }
-
+            else
+            {
+                Debug.WriteLine("[PARKING SERVICE] ⚠️ No lane filter - counting ALL cars!");
+            }
+            //  FILTER THEO VEHICLEGROUPID (loại xe: ô tô, xe máy, etc.)
+            if (!string.IsNullOrWhiteSpace(vehicleGroupId))
+            {
+                Debug.WriteLine($"[PARKING SERVICE] Filtering by VehicleGroupID: {vehicleGroupId}");
+                var vehicleFilter = builder.Eq(x => x.VehicleGroupID, vehicleGroupId);
+                filter = filter & vehicleFilter;
+            }
             try
             {
                 long count = await _collection.CountDocumentsAsync(filter);
+                Debug.WriteLine($"[PARKING SERVICE] Found {count} cars");
                 return count;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"[LỖI TRUY VẤN]: {ex.Message}");
+                Debug.WriteLine($"[STACK TRACE]: {ex.StackTrace}");
                 return 0;
             }
         }

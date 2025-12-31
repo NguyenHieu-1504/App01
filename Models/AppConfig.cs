@@ -8,8 +8,9 @@ namespace App01.Models
         public int Id { get; set; }
 
         // Cấu hình MongoDB
-        public string MongoConnectionString { get; set; } = "mongodb://kztek:Kztek123456@103.127.207.247:21210/event?authSource=admin&directConnection=true";
-        public string DatabaseName { get; set; } = "MPARKINGEVENT-AOENBD";
+        public string MongoConnectionString { get; set; } = "mongodb://kztek:Kztek123456@14.160.26.45:27701/event?authSource=admin&directConnection=true";
+        public string DatabaseName { get; set; } = "event";
+        public string ResourceDatabaseName { get; set; } = "resource";
         public string CollectionName { get; set; } = "tblCardEventDay";
 
         // Cấu hình Khu vực

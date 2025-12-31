@@ -313,24 +313,54 @@ namespace App01.ViewModels
             Debug.WriteLine("[MAIN] Đã dừng monitoring");
         }
 
+
         private async Task UpdateDataAsync(Area area, List<LedBoard> ledBoards)
         {
             if (_parkingService == null) return;
 
-            //  Lấy danh sách LaneIdMongo từ các Gate của Area
+            //  Lấy danh sách Lane thuộc Area này
             var lanes = _configService.GetLanesByArea(area.Id);
-            var laneIds = lanes.Select(l => l.LaneIdMongo).ToList();
 
-            Debug.WriteLine($"[MAIN] Đếm xe cho Area {area.Name} với {laneIds.Count} lanes");
-            foreach (var laneId in laneIds)
+            if (lanes.Count == 0)
             {
-                Debug.WriteLine($"  - Lane ID: {laneId}");
+                Debug.WriteLine($"[MAIN] ⚠️ Area '{area.Name}' không có Lane nào được gán!");
+                Debug.WriteLine($"[MAIN] → Đang đếm TẤT CẢ xe trong database (không filter)");
+
+                // Đếm tất cả xe (không filter theo lane)
+                long allCars = await _parkingService.CountParkedCarsAsync(null, area.VehicleGroupID);
+                ParkedCount = allCars.ToString();
+                AvailableCount = (area.MaxCapacity - (int)allCars).ToString();
+                return;
             }
 
-            // Đếm xe với filter theo LaneId
-            long parkedCount = await _parkingService.CountParkedCarsAsync(laneIds);
+            //Lấy danh sách LaneIdMongo
+            var laneIds = lanes.Select(l => l.LaneIdMongo).ToList();
 
-            if (parkedCount < 0) return;
+            Debug.WriteLine($"[MAIN] ════════════════════════════════════");
+            Debug.WriteLine($"[MAIN]  Đếm xe cho Area: {area.Name}");
+            Debug.WriteLine($"[MAIN]  Số Gate: {_configService.GetGatesByArea(area.Id).Count}");
+            Debug.WriteLine($"[MAIN]  Số Lane: {laneIds.Count}");
+
+            if (!string.IsNullOrWhiteSpace(area.VehicleGroupID))
+            {
+                Debug.WriteLine($"[MAIN] 🚙 Filter loại xe: {area.VehicleGroupID}");
+            }
+
+            Debug.WriteLine($"[MAIN] 🔍 Danh sách Lane IDs:");
+            foreach (var laneId in laneIds)
+            {
+                var lane = lanes.First(l => l.LaneIdMongo == laneId);
+                Debug.WriteLine($"     - {lane.LaneName} ({lane.LaneCode}): {laneId}");
+            }
+
+            //  Đếm xe với filter theo LaneIDIn + VehicleGroupID
+            long parkedCount = await _parkingService.CountParkedCarsAsync(laneIds, area.VehicleGroupID);
+
+            if (parkedCount < 0)
+            {
+                Debug.WriteLine("[MAIN] ❌ Lỗi khi đếm xe!");
+                return;
+            }
 
             int currentParked = (int)parkedCount;
             int currentAvailable = area.MaxCapacity - currentParked;
@@ -338,9 +368,10 @@ namespace App01.ViewModels
             ParkedCount = currentParked.ToString();
             AvailableCount = currentAvailable.ToString();
 
-            Debug.WriteLine($"[MAIN] Xe: {currentParked}, Chỗ: {currentAvailable}");
+            Debug.WriteLine($"[MAIN] ✅ KẾT QUẢ: Xe đang gửi = {currentParked}, Chỗ trống = {currentAvailable}");
+            Debug.WriteLine($"[MAIN] ════════════════════════════════════");
 
-            // Cập nhật LED
+            //  Cập nhật LED (giữ nguyên)
             var tasks = new List<Task>();
             foreach (var board in ledBoards)
             {

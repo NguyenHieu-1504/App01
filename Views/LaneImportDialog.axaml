@@ -1,0 +1,116 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="App01.Views.LaneImportDialog"
+        Title="Import Lanes từ MongoDB"
+        Width="700" Height="500"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        x:CompileBindings="False">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="20">
+        
+        <!-- Header -->
+        <TextBlock Grid.Row="0" 
+                   Text="🛣️ Chọn Lanes để import vào hệ thống" 
+                   FontSize="16" FontWeight="Bold"
+                   Margin="0,0,0,15"/>
+
+        <!-- Chọn Gate -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15">
+            <TextBlock Text="Gán vào cổng:" 
+                       VerticalAlignment="Center"
+                       Margin="0,0,10,0"/>
+            <ComboBox Name="CbGateSelect" 
+                      Width="200"
+                      PlaceholderText="Chọn cổng..."/>
+            <TextBlock Text="(Tất cả Lanes được chọn sẽ thuộc cổng này)" 
+                       VerticalAlignment="Center"
+                       Foreground="Gray"
+                       FontSize="11"
+                       Margin="10,0,0,0"/>
+        </StackPanel>
+
+        <!-- Danh sách Lanes -->
+        <Border Grid.Row="2" 
+                BorderBrush="LightGray" 
+                BorderThickness="1"
+                Background="White">
+            <ScrollViewer>
+                <ItemsControl Name="LanesList" Margin="10">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="#E0E0E0" 
+                                    BorderThickness="0,0,0,1"
+                                    Padding="10,8">
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <CheckBox IsChecked="{Binding IsSelected}"
+                                              VerticalAlignment="Center"/>
+                                    
+                                    <StackPanel Spacing="3">
+                                        <TextBlock FontWeight="Bold">
+                                            <Run Text="{Binding Lane.LaneName}"/>
+                                            <Run Text=" (" Foreground="Gray"/>
+                                            <Run Text="{Binding Lane.LaneCode}" Foreground="Gray"/>
+                                            <Run Text=")" Foreground="Gray"/>
+                                        </TextBlock>
+                                        
+                                        <TextBlock FontSize="11" Foreground="Gray">
+                                            <Run Text="ID: "/>
+                                            <Run Text="{Binding Lane.LaneID}"/>
+                                            <Run Text=" | Type: "/>
+                                            <Run Text="{Binding Lane.LaneType}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                    
+                                    <!-- Badge LaneType -->
+                                    <Border Background="{Binding LaneTypeBadgeColor}" 
+                                            CornerRadius="3"
+                                            Padding="5,2"
+                                            VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding LaneTypeText}" 
+                                                   FontSize="10"
+                                                   Foreground="White"/>
+                                    </Border>
+                                    
+                                    <!-- Badge Inactive -->
+                                    <Border Background="Orange" 
+                                            CornerRadius="3"
+                                            Padding="5,2"
+                                            VerticalAlignment="Center"
+                                            IsVisible="{Binding Lane.Inactive}">
+                                        <TextBlock Text="Inactive" 
+                                                   FontSize="10"
+                                                   Foreground="White"/>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Footer Buttons -->
+        <StackPanel Grid.Row="3" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right"
+                    Spacing="10"
+                    Margin="0,15,0,0">
+            <TextBlock Name="TxtSelectedCount"
+                       Text="Đã chọn: 0 Lanes"
+                       VerticalAlignment="Center"
+                       Foreground="Gray"
+                       Margin="0,0,20,0"/>
+            <Button Name="BtnCancel" 
+                    Content="❌ Hủy" 
+                    Width="100"
+                    Click="BtnCancel_Click"/>
+            <Button Name="BtnImport" 
+                    Content="✅ Import" 
+                    Width="120"
+                    Click="BtnImport_Click"
+                    Background="DodgerBlue"
+                    Foreground="White"/>
+        </StackPanel>
+    </Grid>
+</Window>

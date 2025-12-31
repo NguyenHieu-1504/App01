@@ -38,6 +38,11 @@
                         </StackPanel>
 
                         <StackPanel Spacing="10">
+                            <TextBlock Text="Resource Database Name (Cấu hình):"/>
+                            <TextBox Name="txtResourceDbName" Watermark="MPARKING-..." ToolTip.Tip="Chứa tblGate, tblLane"/>
+                        </StackPanel>
+
+                        <StackPanel Spacing="10">
                             <TextBlock Text="Collection Name:"/>
                             <TextBox Name="txtCollectionName" IsReadOnly="True" Watermark="tblCardEventDay"/>
                         </StackPanel>

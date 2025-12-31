@@ -4,7 +4,6 @@ using App01.ViewModels;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
@@ -21,7 +20,7 @@ namespace App01.Views
         private ObservableCollection<LedBoard> _ledBoards = new();
         private ObservableCollection<DisplayTemplate> _templates = new();
 
-        //  Collections cho Gates & Lanes
+        // ✨ Collections cho Gates & Lanes
         private ObservableCollection<Gate> _gates = new();
         private ObservableCollection<Lane> _lanes = new();
         private ObservableCollection<Area> _areasForGate = new();
@@ -87,7 +86,7 @@ namespace App01.Views
             }
         }
 
-        //  Reload Gates & Lanes
+        // ✨ Reload Gates & Lanes
         private void ReloadGatesAndLanes()
         {
             // Load Areas cho ComboBox
@@ -118,7 +117,7 @@ namespace App01.Views
             if (cbGateForLane != null)
             {
                 cbGateForLane.ItemsSource = _gates;
-                cbGateForLane.DisplayMemberBinding = new Avalonia.Data.Binding("Name");
+                cbGateForLane.DisplayMemberBinding = new Avalonia.Data.Binding("GateName"); // ✅ Sửa từ "Name" → "GateName"
             }
 
             // Load Lanes
@@ -308,7 +307,7 @@ namespace App01.Views
             }
         }
 
-        // =================  EVENTS: GATES & LANES =================
+        // ================= ✨ EVENTS: GATES & LANES =================
 
         /// <summary>
         /// Load Gates từ MongoDB vào hệ thống
@@ -318,11 +317,19 @@ namespace App01.Views
             try
             {
                 var config = _configService.GetConfig();
+
+                if (string.IsNullOrWhiteSpace(config.ResourceDatabaseName))
+                {
+                    await ShowMessageDialog("Lỗi cấu hình",
+                        "⚠️ Chưa cấu hình Resource Database!");
+                    return;
+                }
+
                 var service = new GateLaneService();
 
-                if (!service.Connect(config.MongoConnectionString, config.DatabaseName))
+                if (!service.Connect(config.MongoConnectionString, config.ResourceDatabaseName))
                 {
-                    await ShowMessageDialog("Lỗi", "❌ Không thể kết nối MongoDB!");
+                    await ShowMessageDialog("Lỗi", "❌ Không thể kết nối Resource Database!");
                     return;
                 }
 
@@ -334,8 +341,25 @@ namespace App01.Views
                     return;
                 }
 
-                // Hiển thị dialog để chọn Area cho các Gate
-                await ShowGateImportDialog(gatesFromMongo);
+                // ✨ Hiển thị dialog import
+                var areas = _configService.GetAllAreas();
+                var dialog = new GateImportDialog(gatesFromMongo, areas);
+                var result = await dialog.ShowDialog<GateImportDialog?>(this);
+
+                if (result != null && result.SelectedGates.Count > 0)
+                {
+                    // Lưu vào database
+                    foreach (var gate in result.SelectedGates)
+                    {
+                        _configService.InsertGate(gate);
+                        _gates.Add(gate);
+                    }
+
+                    ReloadGatesAndLanes();
+
+                    await ShowMessageDialog("Thành công",
+                        $"✅ Đã import {result.SelectedGates.Count} Gates vào '{result.SelectedArea?.Name}'!");
+                }
             }
             catch (Exception ex)
             {
@@ -351,11 +375,19 @@ namespace App01.Views
             try
             {
                 var config = _configService.GetConfig();
+
+                if (string.IsNullOrWhiteSpace(config.ResourceDatabaseName))
+                {
+                    await ShowMessageDialog("Lỗi cấu hình",
+                        "⚠️ Chưa cấu hình Resource Database!");
+                    return;
+                }
+
                 var service = new GateLaneService();
 
-                if (!service.Connect(config.MongoConnectionString, config.DatabaseName))
+                if (!service.Connect(config.MongoConnectionString, config.ResourceDatabaseName))
                 {
-                    await ShowMessageDialog("Lỗi", "❌ Không thể kết nối MongoDB!");
+                    await ShowMessageDialog("Lỗi", "❌ Không thể kết nối Resource Database!");
                     return;
                 }
 
@@ -367,51 +399,39 @@ namespace App01.Views
                     return;
                 }
 
-                // Hiển thị dialog để chọn Gate cho các Lane
-                await ShowLaneImportDialog(lanesFromMongo);
+                // ✨ Hiển thị dialog import
+                var gates = _configService.GetAllGates();
+
+                if (gates.Count == 0)
+                {
+                    await ShowMessageDialog("Lỗi",
+                        "⚠️ Chưa có Gate nào!\n\n" +
+                        "Vui lòng import Gates trước, sau đó mới import Lanes.");
+                    return;
+                }
+
+                var dialog = new LaneImportDialog(lanesFromMongo, gates);
+                var result = await dialog.ShowDialog<LaneImportDialog?>(this);
+
+                if (result != null && result.SelectedLanes.Count > 0)
+                {
+                    // Lưu vào database
+                    foreach (var lane in result.SelectedLanes)
+                    {
+                        _configService.InsertLane(lane);
+                        _lanes.Add(lane);
+                    }
+
+                    ReloadGatesAndLanes();
+
+                    await ShowMessageDialog("Thành công",
+                        $"✅ Đã import {result.SelectedLanes.Count} Lanes vào '{result.SelectedGate?.GateName}'!");
+                }
             }
             catch (Exception ex)
             {
                 await ShowMessageDialog("Lỗi", $"❌ {ex.Message}");
             }
-        }
-
-        private async Task ShowGateImportDialog(List<GateMongo> gatesFromMongo)
-        {
-            var dialog = new Window
-            {
-                Title = "Import Gates từ MongoDB",
-                Width = 600,
-                Height = 400,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                Content = new TextBlock
-                {
-                    Text = $"Tìm thấy {gatesFromMongo.Count} Gates.\n\nChức năng import đang được phát triển...",
-                    Margin = new Avalonia.Thickness(20)
-                }
-            };
-            await dialog.ShowDialog(this);
-
-            // TODO: Implement full import dialog với selection
-        }
-
-        private async Task ShowLaneImportDialog(List<LaneMongo> lanesFromMongo)
-        {
-            var dialog = new Window
-            {
-                Title = "Import Lanes từ MongoDB",
-                Width = 600,
-                Height = 400,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                Content = new TextBlock
-                {
-                    Text = $"Tìm thấy {lanesFromMongo.Count} Lanes.\n\nChức năng import đang được phát triển...",
-                    Margin = new Avalonia.Thickness(20)
-                }
-            };
-            await dialog.ShowDialog(this);
-
-            // TODO: Implement full import dialog với selection
         }
 
         private void BtnAddGate_Click(object? sender, RoutedEventArgs e)
