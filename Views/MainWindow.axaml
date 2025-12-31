@@ -61,12 +61,14 @@
                             Click="BtnTestLed_Click"
                             Background="#34495E"
                             Foreground="White"/>
-                    <Button Name="btnReload" Content="🔄 Reload" Click="BtnReload_Click"/>
+                    <Button Name="btnReload" Content="🔄 Reload" Click="BtnReload_Click"
+                            Background="#34495E"
+                            Foreground="White"/>
                     <Button Name="btnSettings" 
                             Content="⚙️ Settings" 
                             Click="BtnSettings_Click"
                             Background="#34495E"
-                            Foreground="White"/>
+                            Foreground="LightGray"/>
                 </StackPanel>
             </Grid>
         </Border>

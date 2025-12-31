@@ -20,7 +20,7 @@ namespace App01.Views
         private ObservableCollection<LedBoard> _ledBoards = new();
         private ObservableCollection<DisplayTemplate> _templates = new();
 
-        // ✨ Collections cho Gates & Lanes
+        // Collections cho Gates & Lanes
         private ObservableCollection<Gate> _gates = new();
         private ObservableCollection<Lane> _lanes = new();
         private ObservableCollection<Area> _areasForGate = new();
@@ -86,7 +86,7 @@ namespace App01.Views
             }
         }
 
-        // ✨ Reload Gates & Lanes
+        // Reload Gates & Lanes
         private void ReloadGatesAndLanes()
         {
             // Load Areas cho ComboBox
@@ -307,7 +307,7 @@ namespace App01.Views
             }
         }
 
-        // ================= ✨ EVENTS: GATES & LANES =================
+        // ================= GATES & LANES =================
 
         /// <summary>
         /// Load Gates từ MongoDB vào hệ thống
@@ -341,7 +341,7 @@ namespace App01.Views
                     return;
                 }
 
-                // ✨ Hiển thị dialog import
+                //  Hiển thị dialog import
                 var areas = _configService.GetAllAreas();
                 var dialog = new GateImportDialog(gatesFromMongo, areas);
                 var result = await dialog.ShowDialog<GateImportDialog?>(this);

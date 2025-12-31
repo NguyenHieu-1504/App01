@@ -19,10 +19,10 @@ namespace App01.Services
             {
                 var client = new MongoClient(connectionString);
                 var db = client.GetDatabase(dbName);
-                // Tên collection phải chuẩn xác
+                
                 _collection = db.GetCollection<ParkingRecord>("tblCardEventDay");
 
-                // Ping thử server 1 cái cho chắc
+                
                 db.RunCommandAsync((Command<BsonDocument>)"{ping:1}").Wait();
                 return true;
             }
