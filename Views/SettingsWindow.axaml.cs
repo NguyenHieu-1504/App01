@@ -14,6 +14,7 @@ namespace App01.Views
     public partial class SettingsWindow : Window
     {
         private readonly ConfigService _configService;
+        private bool _isDataLoading = false;
 
         // ObservableCollection giúp UI tự động cập nhật khi list thay đổi
         private ObservableCollection<Area> _areas = new();
@@ -43,20 +44,78 @@ namespace App01.Views
 
         private void LoadData()
         {
-            // 1. Load MongoDB Config
-            var config = _configService.GetConfig();
-            if (config != null)
-            {
-                txtMongoConnection.Text = config.MongoConnectionString;
-                txtDatabaseName.Text = config.DatabaseName;
-                txtCollectionName.Text = "tblCardEventDay";
-            }
+            _isDataLoading = true; // Bắt đầu load, chặn sự kiện
 
-            // 2. Load Lists
-            ReloadAreas();
-            ReloadLedBoards();
-            ReloadTemplates();
-            ReloadGatesAndLanes();
+            try
+            {
+                // 1. Load MongoDB Config
+                var config = _configService.GetConfig();
+                if (config != null)
+                {
+                    txtMongoConnection.Text = config.MongoConnectionString;
+                    txtDatabaseName.Text = config.DatabaseName;
+                    txtCollectionName.Text = "tblCardEventDay";
+                }
+
+                // 2. Load Lists
+                ReloadAreas();
+                ReloadLedBoards();
+                ReloadTemplates();
+                ReloadGatesAndLanes();
+                ReloadStartupSettings(); //  thay đổi CheckBox, nhưng cờ đang bật
+            }
+            finally
+            {
+                _isDataLoading = false; // Load xong, cho phép sự kiện chạy bình thường
+            }
+        }
+
+        private void ReloadStartupSettings()
+        {
+            var chkStartup = this.FindControl<CheckBox>("ChkStartWithWindows");
+            if (chkStartup != null)
+            {
+                // Kiểm tra trạng thái thực tế từ Registry
+                bool isEnabled = StartupManager.IsStartupEnabled();
+                chkStartup.IsChecked = isEnabled;
+
+                Debug.WriteLine($"[SETTINGS] Startup with Windows: {isEnabled}");
+            }
+        }
+
+        private void ChkStartWithWindows_Changed(object? sender, RoutedEventArgs e)
+        {
+            // Nếu đang load dữ liệu thì không làm gì cả (tránh hiện thông báo lặp lại)
+            if (_isDataLoading) return;
+
+            var chkStartup = sender as CheckBox;
+            if (chkStartup == null) return;
+
+            bool enable = chkStartup.IsChecked ?? false;
+
+            // Cập nhật Registry
+            bool success = StartupManager.SetStartup(enable);
+
+            if (success)
+            {
+                // Lưu vào config
+                var config = _configService.GetConfig();
+                config.StartWithWindows = enable;
+                _configService.UpdateConfig(config);
+
+                string message = enable
+                    ? " Đã bật tự động khởi động cùng hệ thống!\n\nỨng dụng sẽ tự động chạy khi bạn khởi động máy tính."
+                    : " Đã tắt tự động khởi động!\n\nỨng dụng sẽ không tự chạy khi hệ thống khởi động nữa.";
+
+                ShowMessage(message);
+                Debug.WriteLine($"[SETTINGS] Startup with Windows: {enable}");
+            }
+            else
+            {
+                // Rollback checkbox nếu thất bại
+                chkStartup.IsChecked = !enable;
+                ShowMessage("❌ Không thể thay đổi cài đặt!\n\nVui lòng chạy ứng dụng với quyền Administrator.");
+            }
         }
 
         // --- Helpers Load Data ---

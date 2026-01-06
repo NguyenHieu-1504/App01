@@ -53,6 +53,55 @@
                 </ScrollViewer>
             </TabItem>
 
+            <TabItem Header="⚙️ Cài đặt chung">
+    <StackPanel Spacing="15" Margin="20">
+        <TextBlock Text="CÀI ĐẶT ỨNG DỤNG" 
+                   FontWeight="Bold" 
+                   FontSize="18"
+                   Margin="0,0,0,10"/>
+        
+        <!-- Khởi động cùng Windows -->
+        <Border BorderBrush="LightGray" 
+                BorderThickness="1" 
+                Padding="15"
+                Background="White">
+            <StackPanel Spacing="10">
+                <CheckBox Name="ChkStartWithWindows"
+                          Content="🚀 Tự động khởi động cùng hệ thống"
+                          FontSize="14"
+                          Checked="ChkStartWithWindows_Changed"
+                          Unchecked="ChkStartWithWindows_Changed"/>
+                
+                <TextBlock Text="Khi bật, ứng dụng sẽ tự động chạy khi hệ thống khởi động"
+                           Foreground="Gray"
+                           FontSize="11"
+                           Margin="30,0,0,0"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- Các cài đặt khác -->
+        <Border BorderBrush="LightGray" 
+                BorderThickness="1" 
+                Padding="15"
+                Background="White">
+            <StackPanel Spacing="10">
+                <TextBlock Text="📊 Hiển thị" FontWeight="Bold"/>
+                
+                <CheckBox Name="ChkMinimizeToTray"
+                          Content="Thu nhỏ vào System Tray khi đóng"
+                          IsEnabled="False"
+                          ToolTip.Tip="Tính năng đang phát triển"/>
+                
+                <CheckBox Name="ChkShowNotifications"
+                          Content="Hiển thị thông báo khi gần hết chỗ"
+                          IsEnabled="False"
+                          ToolTip.Tip="Tính năng đang phát triển"/>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</TabItem>
+
             <TabItem Header="🚪 Cổng &amp; Làn">
                 <ScrollViewer>
                     <Grid RowDefinitions="Auto,Auto,*,Auto,Auto,Auto,*" Margin="10">

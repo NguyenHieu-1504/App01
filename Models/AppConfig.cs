@@ -20,5 +20,8 @@ namespace App01.Models
         // Cấu hình LED 
         public string LedIpAddress { get; set; } = "192.168.1.250";
         public int LedPort { get; set; } = 100;
+
+        // Khởi dộng cùng Windows
+        public bool StartWithWindows { get; set; } = false;
     }
 }
