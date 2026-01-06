@@ -56,6 +56,13 @@
                             Background="#E74C3C"
                             Foreground="White"
                             IsEnabled="{Binding IsRunning}"/>-->
+                            <!-- Thêm button vào MainWindow -->
+                    <Button Name="BtnDashboard" 
+                            Content="📊 Dashboard" 
+                            Click="BtnDashboard_Click"
+                            Background="#34495E"
+                            Foreground="White"
+                            Margin="10"/>
                     <Button Name="btnTestLed" 
                             Content="🔧 Test LED" 
                             Click="BtnTestLed_Click"

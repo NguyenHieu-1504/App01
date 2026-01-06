@@ -23,6 +23,12 @@ namespace App01.Views
             // TODO: Implement reload logic nếu cần
         }
 
+        private void BtnDashboard_Click(object? sender, RoutedEventArgs e)
+        {
+            var dashboard = new DashboardWindow();
+            dashboard.Show();
+        }
+
         private void BtnTestLed_Click(object? sender, RoutedEventArgs e)
         {
             var testWindow = new LedTestWindow();
@@ -52,7 +58,7 @@ namespace App01.Views
         //    }
         //}
 
-        private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        private void MainWindow_Closing(object? sender, WindowClosingEventArgs e)
         {
             // Cleanup resources
             if (DataContext is MainWindowViewModel vm)

@@ -1,0 +1,211 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="App01.Views.DashboardWindow"
+        Title="📊 Dashboard - Tổng Quan Bãi Xe"
+        Width="1200" Height="700"
+        WindowStartupLocation="CenterScreen"
+        Background="#F5F7FA"
+        x:CompileBindings="False">
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="20">
+        
+        <!-- Header -->
+        <Border Grid.Row="0" 
+                Background="White"
+                CornerRadius="10"
+                BoxShadow="0 2 8 0 #10000000"
+                Padding="20"
+                Margin="0,0,0,20">
+            <Grid ColumnDefinitions="*,Auto,Auto">
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="📊 TỔNG QUAN BÃI XE" 
+                               FontSize="24" 
+                               FontWeight="Bold"
+                               Foreground="#2C3E50"/>
+                    <TextBlock Name="TxtLastUpdate"
+                               Text="Cập nhật: --:--:--" 
+                               FontSize="12"
+                               Foreground="Gray"
+                               Margin="0,5,0,0"/>
+                </StackPanel>
+                
+                <!-- Tổng số xe -->
+                <Border Grid.Column="1"
+                        Background="#3498DB"
+                        CornerRadius="8"
+                        Padding="15,10"
+                        Margin="10,0">
+                    <StackPanel>
+                        <TextBlock Text="TỔNG XE ĐANG GỬI" 
+                                   FontSize="11"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Name="TxtTotalParked"
+                                   Text="0"
+                                   FontSize="32"
+                                   FontWeight="Bold"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+                
+                <!-- Tổng chỗ trống -->
+                <Border Grid.Column="2"
+                        Background="#27AE60"
+                        CornerRadius="8"
+                        Padding="15,10">
+                    <StackPanel>
+                        <TextBlock Text="TỔNG CHỖ TRỐNG" 
+                                   FontSize="11"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center"/>
+                        <TextBlock Name="TxtTotalAvailable"
+                                   Text="0"
+                                   FontSize="32"
+                                   FontWeight="Bold"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Areas Grid -->
+        <ScrollViewer Grid.Row="1">
+            <ItemsControl Name="AreasItemsControl" Margin="0,0,0,20">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <!-- Area Card -->
+                        <Border Background="White"
+                                CornerRadius="12"
+                                BoxShadow="0 2 8 0 #15000000"
+                                Width="280"
+                                Height="220"
+                                Margin="0,0,20,20"
+                                Padding="0">
+                            
+                            <Grid RowDefinitions="Auto,*,Auto">
+                                
+                                <!-- Header với màu theo status -->
+                                <Border Grid.Row="0"
+                                        Background="{Binding StatusColor}"
+                                        CornerRadius="12,12,0,0"
+                                        Padding="15,12">
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="18"
+                                               FontWeight="Bold"
+                                               Foreground="White"/>
+                                </Border>
+                                
+                                <!-- Body -->
+                                <StackPanel Grid.Row="1" 
+                                            Spacing="8"
+                                            Margin="20,15">
+                                    
+                                    <!-- Số xe đang gửi -->
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock Text="🚗" FontSize="20"/>
+                                        <TextBlock FontSize="14" Foreground="#7F8C8D">
+                                            <Run Text="Đang gửi: "/>
+                                            <Run Text="{Binding ParkedCount}" FontWeight="Bold" Foreground="#2C3E50"/>
+                                            <Run Text=" / "/>
+                                            <Run Text="{Binding MaxCapacity}" Foreground="#95A5A6"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                    
+                                    <!-- Chỗ trống -->
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock Text="🅿️" FontSize="20"/>
+                                        <TextBlock FontSize="14" Foreground="#7F8C8D">
+                                            <Run Text="Chỗ trống: "/>
+                                            <Run Text="{Binding AvailableCount}" FontWeight="Bold" FontSize="16" Foreground="{Binding StatusColor}"/>
+                                            <Run Text=" chỗ"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                    
+                                    <!-- Progress bar -->
+                                    <ProgressBar Value="{Binding PercentFilled}"
+                                                 Maximum="100"
+                                                 Height="8"
+                                                 Foreground="{Binding StatusColor}"
+                                                 Background="#ECF0F1"
+                                                 CornerRadius="4"
+                                                 Margin="0,5"/>
+                                </StackPanel>
+                                
+                                <!-- Footer -->
+                                <Border Grid.Row="2"
+                                        Background="{Binding StatusLightColor}"
+                                        CornerRadius="0,0,12,12"
+                                        Padding="15,10">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding StatusText}"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{Binding StatusColor}"/>
+                                        <TextBlock Grid.Column="1"
+                                                   FontSize="18"
+                                                   FontWeight="Bold"
+                                                   Foreground="{Binding StatusColor}">
+                                            <Run Text="{Binding PercentAvailable}"/>
+                                            <Run Text="%"/>
+                                        </TextBlock>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Footer Controls -->
+        <Border Grid.Row="2"
+                Background="White"
+                CornerRadius="10"
+                BoxShadow="0 2 8 0 #10000000"
+                Padding="15">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10">
+                    <TextBlock Text="🔄 Cập nhật tự động mỗi" VerticalAlignment="Center" Foreground="Gray"/>
+                    <ComboBox Name="CbRefreshInterval"
+                              SelectedIndex="1"
+                              Width="100"
+                              SelectionChanged="CbRefreshInterval_Changed">
+                        <ComboBoxItem Content="1 giây"/>
+                        <ComboBoxItem Content="5 giây"/>
+                        <ComboBoxItem Content="10 giây"/>
+                        <ComboBoxItem Content="30 giây"/>
+                    </ComboBox>
+                </StackPanel>
+                
+                <Button Grid.Column="1"
+                        Name="BtnRefresh"
+                        Content="🔄 Làm mới"
+                        Width="120"
+                        Margin="10,0"
+                        Click="BtnRefresh_Click"/>
+                
+                <Button Grid.Column="2"
+                        Name="BtnSettings"
+                        Content="⚙️ Cài đặt"
+                        Width="120"
+                        Margin="0,0,10,0"
+                        Click="BtnSettings_Click"/>
+                
+                <Button Grid.Column="3"
+                        Name="BtnClose"
+                        Content="❌ Đóng"
+                        Width="100"
+                        Click="BtnClose_Click"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
