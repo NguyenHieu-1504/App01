@@ -57,6 +57,52 @@ namespace App01.Views
             ReloadLedBoards();
             ReloadTemplates();
             ReloadGatesAndLanes();
+            ReloadStartupSettings();
+        }
+
+        private void ReloadStartupSettings()
+        {
+            var chkStartup = this.FindControl<CheckBox>("ChkStartWithWindows");
+            if (chkStartup != null)
+            {
+                // Kiểm tra trạng thái thực tế từ Registry
+                bool isEnabled = StartupManager.IsStartupEnabled();
+                chkStartup.IsChecked = isEnabled;
+
+                Debug.WriteLine($"[SETTINGS] Startup with Windows: {isEnabled}");
+            }
+        }
+
+        private void ChkStartWithWindows_Changed(object? sender, RoutedEventArgs e)
+        {
+            var chkStartup = sender as CheckBox;
+            if (chkStartup == null) return;
+
+            bool enable = chkStartup.IsChecked ?? false;
+
+            // Cập nhật Registry
+            bool success = StartupManager.SetStartup(enable);
+
+            if (success)
+            {
+                // Lưu vào config
+                var config = _configService.GetConfig();
+                config.StartWithWindows = enable;
+                _configService.UpdateConfig(config);
+
+                string message = enable
+                    ? " Đã bật tự động khởi động cùng Windows!\n\nỨng dụng sẽ tự động chạy khi bạn khởi động máy tính."
+                    : " Đã tắt tự động khởi động!\n\nỨng dụng sẽ không tự chạy khi Windows khởi động nữa.";
+
+                ShowMessage(message);
+                Debug.WriteLine($"[SETTINGS] Startup with Windows: {enable}");
+            }
+            else
+            {
+                // Rollback checkbox nếu thất bại
+                chkStartup.IsChecked = !enable;
+                ShowMessage("❌ Không thể thay đổi cài đặt!\n\nVui lòng chạy ứng dụng với quyền Administrator.");
+            }
         }
 
         // --- Helpers Load Data ---
