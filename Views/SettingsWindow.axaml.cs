@@ -91,8 +91,8 @@ namespace App01.Views
                 _configService.UpdateConfig(config);
 
                 string message = enable
-                    ? " Đã bật tự động khởi động cùng Windows!\n\nỨng dụng sẽ tự động chạy khi bạn khởi động máy tính."
-                    : " Đã tắt tự động khởi động!\n\nỨng dụng sẽ không tự chạy khi Windows khởi động nữa.";
+                    ? " Đã bật tự động khởi động cùng hệ thống!\n\nỨng dụng sẽ tự động chạy khi bạn khởi động máy tính."
+                    : " Đã tắt tự động khởi động!\n\nỨng dụng sẽ không tự chạy khi hệ thống khởi động nữa.";
 
                 ShowMessage(message);
                 Debug.WriteLine($"[SETTINGS] Startup with Windows: {enable}");

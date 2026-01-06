@@ -67,12 +67,12 @@
                 Background="White">
             <StackPanel Spacing="10">
                 <CheckBox Name="ChkStartWithWindows"
-                          Content="🚀 Tự động khởi động cùng Windows"
+                          Content="🚀 Tự động khởi động cùng hệ thống"
                           FontSize="14"
                           Checked="ChkStartWithWindows_Changed"
                           Unchecked="ChkStartWithWindows_Changed"/>
                 
-                <TextBlock Text="Khi bật, ứng dụng sẽ tự động chạy khi Windows khởi động"
+                <TextBlock Text="Khi bật, ứng dụng sẽ tự động chạy khi hệ thống khởi động"
                            Foreground="Gray"
                            FontSize="11"
                            Margin="30,0,0,0"
