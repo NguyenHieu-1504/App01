@@ -34,6 +34,11 @@ namespace App01.Services
         }
 
         // Hàm đếm số xe đang gửi
+        /// <summary>
+        /// Đếm số xe đang thực sự nằm trong bãi
+        /// </summary>
+        /// <param name="laneIds">Danh sách ID các làn VÀO thuộc khu vực này</param>
+        /// <param name="vehicleGroupId">ID nhóm xe (nếu cần lọc xe máy/ô tô)</param>
         public async Task<long> CountParkedCarsAsync(List<string>? laneIds = null,
             string? vehicleGroupId = null)
         {

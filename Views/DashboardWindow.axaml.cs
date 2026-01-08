@@ -65,29 +65,38 @@ namespace App01.Views
                     string connString = area.MongoConnectionString ?? config.MongoConnectionString;
                     string dbName = area.DatabaseName ?? config.DatabaseName;
 
-                    if (service.Connect(connString, dbName))
+                    if (!service.Connect(connString, dbName))
                     {
-                        _parkingServices[area.Id] = service;
-                        Debug.WriteLine($"[DASHBOARD] Connected to Area: {area.Name}");
+                        Debug.WriteLine($"[DASHBOARD] ❌ Failed to connect: {area.Name}");
+                        continue;
+                    }
 
-                        // Lấy danh sách LaneId
-                        var lanes = _configService.GetLanesByArea(area.Id);
-                        _areaLaneIds[area.Id] = lanes.Select(l => l.LaneIdMongo).ToList();
+                    _parkingServices[area.Id] = service;
+                    Debug.WriteLine($"[DASHBOARD] ✅ Connected to Area: {area.Name}");
 
-                        // Tạo ViewModel
-                        var card = new AreaCardViewModel
-                        {
-                            Name = area.Name,
-                            MaxCapacity = area.MaxCapacity,
-                            ParkedCount = 0,
-                            AvailableCount = area.MaxCapacity
-                        };
-                        _areaCards.Add(card);
+                    //  Lấy danh sách LaneId và KIỂM TRA
+                    var lanes = _configService.GetLanesByArea(area.Id);
+
+                    if (lanes.Count == 0)
+                    {
+                        Debug.WriteLine($"[DASHBOARD] ⚠️ Area '{area.Name}' CHƯA GÁN LANE!");
+                        _areaLaneIds[area.Id] = new List<string>(); // Empty list → Sẽ bị skip
                     }
                     else
                     {
-                        Debug.WriteLine($"[DASHBOARD] Failed to connect: {area.Name}");
+                        _areaLaneIds[area.Id] = lanes.Select(l => l.LaneIdMongo).ToList();
+                        Debug.WriteLine($"[DASHBOARD] ✅ Area '{area.Name}' có {lanes.Count} lanes");
                     }
+
+                    // Tạo ViewModel
+                    var card = new AreaCardViewModel
+                    {
+                        Name = lanes.Count > 0 ? area.Name : $"{area.Name} ⚠️", // Thêm icon nếu chưa có lane
+                        MaxCapacity = area.MaxCapacity,
+                        ParkedCount = 0,
+                        AvailableCount = area.MaxCapacity
+                    };
+                    _areaCards.Add(card);
                 }
 
                 // Load dữ liệu ban đầu
@@ -108,6 +117,7 @@ namespace App01.Views
             {
                 int totalParked = 0;
                 int totalAvailable = 0;
+                int totalCapacity = 0;
 
                 var areas = _configService.GetActiveAreas();
 
@@ -116,33 +126,54 @@ namespace App01.Views
                     var area = areas[i];
                     var card = _areaCards[i];
 
-                    if (_parkingServices.ContainsKey(area.Id))
+                    if (!_parkingServices.ContainsKey(area.Id))
                     {
-                        var service = _parkingServices[area.Id];
-                        var laneIds = _areaLaneIds.ContainsKey(area.Id)
-                            ? _areaLaneIds[area.Id]
-                            : null;
+                        Debug.WriteLine($"[DASHBOARD] ⚠️ Area '{area.Name}' không có service");
+                        continue;
+                    }
 
-                        // Đếm xe
-                        long count = await service.CountParkedCarsAsync(laneIds, area.VehicleGroupID);
+                    // ✅ FIX: Kiểm tra xem Area có Lane không
+                    if (!_areaLaneIds.ContainsKey(area.Id) || _areaLaneIds[area.Id].Count == 0)
+                    {
+                        Debug.WriteLine($"[DASHBOARD] ⚠️ Area '{area.Name}' chưa gán Lane → BỎ QUA");
 
-                        if (count >= 0)
+                        // Hiển thị cảnh báo trên card
+                        await Dispatcher.UIThread.InvokeAsync(() =>
                         {
-                            int parked = (int)count;
-                            int available = area.MaxCapacity - parked;
+                            card.ParkedCount = 0;
+                            card.AvailableCount = 0;
+                            card.Name = $"{area.Name} ⚠️"; // Thêm icon cảnh báo
+                        });
+                        continue; //  BỎ QUA Area này, không đếm
+                    }
 
-                            // Cập nhật card
-                            await Dispatcher.UIThread.InvokeAsync(() =>
-                            {
-                                card.ParkedCount = parked;
-                                card.AvailableCount = available;
-                            });
+                    var service = _parkingServices[area.Id];
+                    var laneIds = _areaLaneIds[area.Id];
 
-                            totalParked += parked;
-                            totalAvailable += available;
+                    // Đếm xe
+                    long count = await service.CountParkedCarsAsync(laneIds, area.VehicleGroupID);
 
-                            Debug.WriteLine($"[DASHBOARD] {area.Name}: {parked}/{area.MaxCapacity}");
-                        }
+                    if (count >= 0)
+                    {
+                        int parked = (int)count;
+                        int available = area.MaxCapacity - parked;
+
+                        // Cập nhật card
+                        await Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            card.ParkedCount = parked;
+                            card.AvailableCount = available;
+                        });
+
+                        totalParked += parked;
+                        totalAvailable += available;
+                        totalCapacity += area.MaxCapacity;
+
+                        Debug.WriteLine($"[DASHBOARD] ✅ {area.Name}: {parked}/{area.MaxCapacity}");
+                    }
+                    else
+                    {
+                        Debug.WriteLine($"[DASHBOARD] ❌ {area.Name}: Lỗi đếm xe");
                     }
                 }
 

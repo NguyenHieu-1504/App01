@@ -321,25 +321,28 @@ namespace App01.ViewModels
             //  Lấy danh sách Lane thuộc Area này
             var lanes = _configService.GetLanesByArea(area.Id);
 
+            //  Nếu không có Lane → KHÔNG ĐẾM, hiển thị cảnh báo
             if (lanes.Count == 0)
             {
-                Debug.WriteLine($"[MAIN] ⚠️ Area '{area.Name}' không có Lane nào được gán!");
-                Debug.WriteLine($"[MAIN] → Đang đếm TẤT CẢ xe trong database (không filter)");
+                Debug.WriteLine($"[MAIN] ⚠️ Area '{area.Name}' chưa gán Lane!");
+                Debug.WriteLine($"[MAIN] → Vui lòng vào Settings → Gán Gate/Lane cho Area này");
 
-                // Đếm tất cả xe (không filter theo lane)
-                long allCars = await _parkingService.CountParkedCarsAsync(null, area.VehicleGroupID);
-                ParkedCount = allCars.ToString();
-                AvailableCount = (area.MaxCapacity - (int)allCars).ToString();
+                // Hiển thị trạng thái lỗi
+                ParkedCount = "--";
+                AvailableCount = "--";
+                ConnectionStatus = $"⚠️ Area '{area.Name}' chưa gán Lane!\n" +
+                                  "Vui lòng vào Settings để gán Gate và Lane.";
+                StatusColor = "Orange";
                 return;
             }
 
-            //Lấy danh sách LaneIdMongo
+            //  Lấy danh sách LaneIdMongo
             var laneIds = lanes.Select(l => l.LaneIdMongo).ToList();
 
             Debug.WriteLine($"[MAIN] ════════════════════════════════════");
-            Debug.WriteLine($"[MAIN]  Đếm xe cho Area: {area.Name}");
-            Debug.WriteLine($"[MAIN]  Số Gate: {_configService.GetGatesByArea(area.Id).Count}");
-            Debug.WriteLine($"[MAIN]  Số Lane: {laneIds.Count}");
+            Debug.WriteLine($"[MAIN] 🚗 Đếm xe cho Area: {area.Name}");
+            Debug.WriteLine($"[MAIN] 📊 Số Gate: {_configService.GetGatesByArea(area.Id).Count}");
+            Debug.WriteLine($"[MAIN] 🛣️ Số Lane: {laneIds.Count}");
 
             if (!string.IsNullOrWhiteSpace(area.VehicleGroupID))
             {
@@ -359,6 +362,8 @@ namespace App01.ViewModels
             if (parkedCount < 0)
             {
                 Debug.WriteLine("[MAIN] ❌ Lỗi khi đếm xe!");
+                ConnectionStatus = "❌ Lỗi kết nối MongoDB!";
+                StatusColor = "Red";
                 return;
             }
 
@@ -367,11 +372,13 @@ namespace App01.ViewModels
 
             ParkedCount = currentParked.ToString();
             AvailableCount = currentAvailable.ToString();
+            ConnectionStatus = $"✅ MongoDB OK - {area.Name}";
+            StatusColor = "Green";
 
             Debug.WriteLine($"[MAIN] ✅ KẾT QUẢ: Xe đang gửi = {currentParked}, Chỗ trống = {currentAvailable}");
             Debug.WriteLine($"[MAIN] ════════════════════════════════════");
 
-            //  Cập nhật LED (giữ nguyên)
+            // Cập nhật LED (giữ nguyên)
             var tasks = new List<Task>();
             foreach (var board in ledBoards)
             {
